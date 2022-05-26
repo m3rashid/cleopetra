@@ -1,0 +1,9 @@
+.vscode
+.idea
+.DS_Store
+
+# environment variables
+.env
+.env.example
+.env.local
+.env.local.example

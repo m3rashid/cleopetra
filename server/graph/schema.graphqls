@@ -1,0 +1,112 @@
+#input NewTodo {
+#  text: String!
+#  userId: String!
+#}
+#
+#type Mutation {
+#  createTodo(input: NewTodo!): Todo!
+#}
+
+enum Role {
+  USER
+  AUTHOR
+  EDITOR
+  ADMIN
+}
+
+type Auth {
+  id: ID!
+  username: String!
+  name: String!
+  password: String!
+  role: Role!
+}
+
+type Author {
+  id: ID!
+  name: String!
+  email: String!
+  photo: String
+  bio: String
+  user: Auth!
+  featured: Boolean
+  published: Boolean
+  posts: [Post]!
+}
+
+type Category {
+  id: ID!
+  name: String!
+  slug: String!
+}
+
+type Like {
+  id: ID!
+  user: Auth!
+}
+
+type Comment {
+  id: ID!
+  user: Auth!
+  comment: String!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  slug: String!
+  excerpt: String!
+  content: String!
+  featuredImage: String
+  featured: Boolean!
+  published: Boolean!
+  deleted: Boolean!
+  categories: [Category]!
+  author: Auth!
+  comments: [Comment]!
+  likes: [Like]!
+}
+
+
+
+
+input loginInput {
+  username: String!
+  password: String!
+}
+
+input signupInput {
+  username: String!
+  password: String!
+  name: String!
+}
+
+input verifyCreateAuthorInput {
+  email: String!
+  photo: String
+  bio: String
+  userId: String!
+}
+
+input createAuthorInput {
+  email: String!
+  otp: String!
+}
+
+type Mutation {
+  login (input: loginInput) : Auth!
+  signup (input: signupInput): Auth!
+  verifyCreateAuthor (input: verifyCreateAuthorInput): String!
+  createAuthor (input: createAuthorInput): Author!
+}
+
+type Query {
+  healthCheck: String!
+  getUser: Auth!
+  getAuthors: [Author]!
+  getAuthor(id: ID!): Author!
+  getPosts: [Post]!
+  getPost(id: ID!): Post!
+  getCategories: [Category]!
+  getCategory(id: ID!): Category!
+}
