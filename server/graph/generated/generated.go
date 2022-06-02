@@ -56,12 +56,16 @@ type ComplexityRoot struct {
 		Bio       func(childComplexity int) int
 		Email     func(childComplexity int) int
 		Featured  func(childComplexity int) int
+		Github    func(childComplexity int) int
 		ID        func(childComplexity int) int
+		Instagram func(childComplexity int) int
 		Name      func(childComplexity int) int
 		Photo     func(childComplexity int) int
 		Posts     func(childComplexity int) int
 		Published func(childComplexity int) int
+		Twitter   func(childComplexity int) int
 		User      func(childComplexity int) int
+		Website   func(childComplexity int) int
 	}
 
 	Category struct {
@@ -71,13 +75,15 @@ type ComplexityRoot struct {
 	}
 
 	Comment struct {
-		Comment func(childComplexity int) int
-		ID      func(childComplexity int) int
-		User    func(childComplexity int) int
+		ID   func(childComplexity int) int
+		Post func(childComplexity int) int
+		Text func(childComplexity int) int
+		User func(childComplexity int) int
 	}
 
 	Like struct {
 		ID   func(childComplexity int) int
+		Post func(childComplexity int) int
 		User func(childComplexity int) int
 	}
 
@@ -99,6 +105,7 @@ type ComplexityRoot struct {
 		FeaturedImage func(childComplexity int) int
 		ID            func(childComplexity int) int
 		Likes         func(childComplexity int) int
+		MinutesToRead func(childComplexity int) int
 		Published     func(childComplexity int) int
 		Slug          func(childComplexity int) int
 		Title         func(childComplexity int) int
@@ -204,12 +211,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Author.Featured(childComplexity), true
 
+	case "Author.github":
+		if e.complexity.Author.Github == nil {
+			break
+		}
+
+		return e.complexity.Author.Github(childComplexity), true
+
 	case "Author.id":
 		if e.complexity.Author.ID == nil {
 			break
 		}
 
 		return e.complexity.Author.ID(childComplexity), true
+
+	case "Author.instagram":
+		if e.complexity.Author.Instagram == nil {
+			break
+		}
+
+		return e.complexity.Author.Instagram(childComplexity), true
 
 	case "Author.name":
 		if e.complexity.Author.Name == nil {
@@ -239,12 +260,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Author.Published(childComplexity), true
 
+	case "Author.twitter":
+		if e.complexity.Author.Twitter == nil {
+			break
+		}
+
+		return e.complexity.Author.Twitter(childComplexity), true
+
 	case "Author.user":
 		if e.complexity.Author.User == nil {
 			break
 		}
 
 		return e.complexity.Author.User(childComplexity), true
+
+	case "Author.website":
+		if e.complexity.Author.Website == nil {
+			break
+		}
+
+		return e.complexity.Author.Website(childComplexity), true
 
 	case "Category.id":
 		if e.complexity.Category.ID == nil {
@@ -267,19 +302,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Category.Slug(childComplexity), true
 
-	case "Comment.comment":
-		if e.complexity.Comment.Comment == nil {
-			break
-		}
-
-		return e.complexity.Comment.Comment(childComplexity), true
-
 	case "Comment.id":
 		if e.complexity.Comment.ID == nil {
 			break
 		}
 
 		return e.complexity.Comment.ID(childComplexity), true
+
+	case "Comment.post":
+		if e.complexity.Comment.Post == nil {
+			break
+		}
+
+		return e.complexity.Comment.Post(childComplexity), true
+
+	case "Comment.text":
+		if e.complexity.Comment.Text == nil {
+			break
+		}
+
+		return e.complexity.Comment.Text(childComplexity), true
 
 	case "Comment.user":
 		if e.complexity.Comment.User == nil {
@@ -294,6 +336,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Like.ID(childComplexity), true
+
+	case "Like.post":
+		if e.complexity.Like.Post == nil {
+			break
+		}
+
+		return e.complexity.Like.Post(childComplexity), true
 
 	case "Like.user":
 		if e.complexity.Like.User == nil {
@@ -419,6 +468,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Post.Likes(childComplexity), true
+
+	case "Post.minutesToRead":
+		if e.complexity.Post.MinutesToRead == nil {
+			break
+		}
+
+		return e.complexity.Post.MinutesToRead(childComplexity), true
 
 	case "Post.published":
 		if e.complexity.Post.Published == nil {
@@ -610,11 +666,15 @@ type Auth {
 
 type Author {
   id: ID!
+  user: Auth!
   name: String!
   email: String!
-  photo: String
   bio: String
-  user: Auth!
+  website: String
+  github: String
+  instagram: String
+  twitter: String
+  photo: String
   featured: Boolean
   published: Boolean
   posts: [Post]!
@@ -629,32 +689,32 @@ type Category {
 type Like {
   id: ID!
   user: Auth!
+  post: Post!
 }
 
 type Comment {
   id: ID!
   user: Auth!
-  comment: String!
+  text: String!
+  post: Post!
 }
 
 type Post {
   id: ID!
+  author: Author!
   title: String!
   slug: String!
   excerpt: String!
   content: String!
+  minutesToRead: Int!
   featuredImage: String
   featured: Boolean!
   published: Boolean!
   deleted: Boolean!
   categories: [Category]!
-  author: Auth!
   comments: [Comment]!
   likes: [Like]!
 }
-
-
-
 
 input loginInput {
   username: String!
@@ -680,10 +740,10 @@ input createAuthorInput {
 }
 
 type Mutation {
-  login (input: loginInput) : Auth!
-  signup (input: signupInput): Auth!
-  verifyCreateAuthor (input: verifyCreateAuthorInput): String!
-  createAuthor (input: createAuthorInput): Author!
+  login(input: loginInput): Auth!
+  signup(input: signupInput): Auth!
+  verifyCreateAuthor(input: verifyCreateAuthorInput): String!
+  createAuthor(input: createAuthorInput): Author!
 }
 
 type Query {
@@ -695,7 +755,8 @@ type Query {
   getPost(id: ID!): Post!
   getCategories: [Category]!
   getCategory(id: ID!): Category!
-}`, BuiltIn: false},
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -1125,6 +1186,62 @@ func (ec *executionContext) fieldContext_Author_id(ctx context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _Author_user(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Author_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Auth)
+	fc.Result = res
+	return ec.marshalNAuth2ᚖgithubᚗcomᚋm3rashidᚋcleopetraᚋserverᚋgraphᚋmodelᚐAuth(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Author_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Author",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Auth_id(ctx, field)
+			case "username":
+				return ec.fieldContext_Auth_username(ctx, field)
+			case "name":
+				return ec.fieldContext_Auth_name(ctx, field)
+			case "password":
+				return ec.fieldContext_Auth_password(ctx, field)
+			case "role":
+				return ec.fieldContext_Auth_role(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Auth", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Author_name(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Author_name(ctx, field)
 	if err != nil {
@@ -1213,47 +1330,6 @@ func (ec *executionContext) fieldContext_Author_email(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Author_photo(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Author_photo(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Photo, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Author_photo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Author",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Author_bio(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Author_bio(ctx, field)
 	if err != nil {
@@ -1295,8 +1371,8 @@ func (ec *executionContext) fieldContext_Author_bio(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Author_user(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Author_user(ctx, field)
+func (ec *executionContext) _Author_website(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Author_website(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1309,43 +1385,192 @@ func (ec *executionContext) _Author_user(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.User, nil
+		return obj.Website, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Auth)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNAuth2ᚖgithubᚗcomᚋm3rashidᚋcleopetraᚋserverᚋgraphᚋmodelᚐAuth(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Author_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Author_website(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Author",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Auth_id(ctx, field)
-			case "username":
-				return ec.fieldContext_Auth_username(ctx, field)
-			case "name":
-				return ec.fieldContext_Auth_name(ctx, field)
-			case "password":
-				return ec.fieldContext_Auth_password(ctx, field)
-			case "role":
-				return ec.fieldContext_Auth_role(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Auth", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Author_github(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Author_github(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Github, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Author_github(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Author",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Author_instagram(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Author_instagram(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Instagram, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Author_instagram(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Author",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Author_twitter(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Author_twitter(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Twitter, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Author_twitter(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Author",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Author_photo(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Author_photo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Photo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Author_photo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Author",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1474,6 +1699,8 @@ func (ec *executionContext) fieldContext_Author_posts(ctx context.Context, field
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Post_id(ctx, field)
+			case "author":
+				return ec.fieldContext_Post_author(ctx, field)
 			case "title":
 				return ec.fieldContext_Post_title(ctx, field)
 			case "slug":
@@ -1482,6 +1709,8 @@ func (ec *executionContext) fieldContext_Author_posts(ctx context.Context, field
 				return ec.fieldContext_Post_excerpt(ctx, field)
 			case "content":
 				return ec.fieldContext_Post_content(ctx, field)
+			case "minutesToRead":
+				return ec.fieldContext_Post_minutesToRead(ctx, field)
 			case "featuredImage":
 				return ec.fieldContext_Post_featuredImage(ctx, field)
 			case "featured":
@@ -1492,8 +1721,6 @@ func (ec *executionContext) fieldContext_Author_posts(ctx context.Context, field
 				return ec.fieldContext_Post_deleted(ctx, field)
 			case "categories":
 				return ec.fieldContext_Post_categories(ctx, field)
-			case "author":
-				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
 				return ec.fieldContext_Post_comments(ctx, field)
 			case "likes":
@@ -1737,8 +1964,8 @@ func (ec *executionContext) fieldContext_Comment_user(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Comment_comment(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Comment_comment(ctx, field)
+func (ec *executionContext) _Comment_text(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_text(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1751,7 +1978,7 @@ func (ec *executionContext) _Comment_comment(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Comment, nil
+		return obj.Text, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1768,7 +1995,7 @@ func (ec *executionContext) _Comment_comment(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Comment_comment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Comment_text(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Comment",
 		Field:      field,
@@ -1776,6 +2003,80 @@ func (ec *executionContext) fieldContext_Comment_comment(ctx context.Context, fi
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Comment_post(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_post(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Post, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Post)
+	fc.Result = res
+	return ec.marshalNPost2ᚖgithubᚗcomᚋm3rashidᚋcleopetraᚋserverᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_post(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Post_id(ctx, field)
+			case "author":
+				return ec.fieldContext_Post_author(ctx, field)
+			case "title":
+				return ec.fieldContext_Post_title(ctx, field)
+			case "slug":
+				return ec.fieldContext_Post_slug(ctx, field)
+			case "excerpt":
+				return ec.fieldContext_Post_excerpt(ctx, field)
+			case "content":
+				return ec.fieldContext_Post_content(ctx, field)
+			case "minutesToRead":
+				return ec.fieldContext_Post_minutesToRead(ctx, field)
+			case "featuredImage":
+				return ec.fieldContext_Post_featuredImage(ctx, field)
+			case "featured":
+				return ec.fieldContext_Post_featured(ctx, field)
+			case "published":
+				return ec.fieldContext_Post_published(ctx, field)
+			case "deleted":
+				return ec.fieldContext_Post_deleted(ctx, field)
+			case "categories":
+				return ec.fieldContext_Post_categories(ctx, field)
+			case "comments":
+				return ec.fieldContext_Post_comments(ctx, field)
+			case "likes":
+				return ec.fieldContext_Post_likes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
 	}
 	return fc, nil
@@ -1876,6 +2177,80 @@ func (ec *executionContext) fieldContext_Like_user(ctx context.Context, field gr
 				return ec.fieldContext_Auth_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Auth", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Like_post(ctx context.Context, field graphql.CollectedField, obj *model.Like) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Like_post(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Post, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Post)
+	fc.Result = res
+	return ec.marshalNPost2ᚖgithubᚗcomᚋm3rashidᚋcleopetraᚋserverᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Like_post(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Like",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Post_id(ctx, field)
+			case "author":
+				return ec.fieldContext_Post_author(ctx, field)
+			case "title":
+				return ec.fieldContext_Post_title(ctx, field)
+			case "slug":
+				return ec.fieldContext_Post_slug(ctx, field)
+			case "excerpt":
+				return ec.fieldContext_Post_excerpt(ctx, field)
+			case "content":
+				return ec.fieldContext_Post_content(ctx, field)
+			case "minutesToRead":
+				return ec.fieldContext_Post_minutesToRead(ctx, field)
+			case "featuredImage":
+				return ec.fieldContext_Post_featuredImage(ctx, field)
+			case "featured":
+				return ec.fieldContext_Post_featured(ctx, field)
+			case "published":
+				return ec.fieldContext_Post_published(ctx, field)
+			case "deleted":
+				return ec.fieldContext_Post_deleted(ctx, field)
+			case "categories":
+				return ec.fieldContext_Post_categories(ctx, field)
+			case "comments":
+				return ec.fieldContext_Post_comments(ctx, field)
+			case "likes":
+				return ec.fieldContext_Post_likes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
 	}
 	return fc, nil
@@ -2111,16 +2486,24 @@ func (ec *executionContext) fieldContext_Mutation_createAuthor(ctx context.Conte
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Author_id(ctx, field)
+			case "user":
+				return ec.fieldContext_Author_user(ctx, field)
 			case "name":
 				return ec.fieldContext_Author_name(ctx, field)
 			case "email":
 				return ec.fieldContext_Author_email(ctx, field)
-			case "photo":
-				return ec.fieldContext_Author_photo(ctx, field)
 			case "bio":
 				return ec.fieldContext_Author_bio(ctx, field)
-			case "user":
-				return ec.fieldContext_Author_user(ctx, field)
+			case "website":
+				return ec.fieldContext_Author_website(ctx, field)
+			case "github":
+				return ec.fieldContext_Author_github(ctx, field)
+			case "instagram":
+				return ec.fieldContext_Author_instagram(ctx, field)
+			case "twitter":
+				return ec.fieldContext_Author_twitter(ctx, field)
+			case "photo":
+				return ec.fieldContext_Author_photo(ctx, field)
 			case "featured":
 				return ec.fieldContext_Author_featured(ctx, field)
 			case "published":
@@ -2184,6 +2567,78 @@ func (ec *executionContext) fieldContext_Post_id(ctx context.Context, field grap
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Post_author(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Post_author(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Author, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Author)
+	fc.Result = res
+	return ec.marshalNAuthor2ᚖgithubᚗcomᚋm3rashidᚋcleopetraᚋserverᚋgraphᚋmodelᚐAuthor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Post_author(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Post",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Author_id(ctx, field)
+			case "user":
+				return ec.fieldContext_Author_user(ctx, field)
+			case "name":
+				return ec.fieldContext_Author_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Author_email(ctx, field)
+			case "bio":
+				return ec.fieldContext_Author_bio(ctx, field)
+			case "website":
+				return ec.fieldContext_Author_website(ctx, field)
+			case "github":
+				return ec.fieldContext_Author_github(ctx, field)
+			case "instagram":
+				return ec.fieldContext_Author_instagram(ctx, field)
+			case "twitter":
+				return ec.fieldContext_Author_twitter(ctx, field)
+			case "photo":
+				return ec.fieldContext_Author_photo(ctx, field)
+			case "featured":
+				return ec.fieldContext_Author_featured(ctx, field)
+			case "published":
+				return ec.fieldContext_Author_published(ctx, field)
+			case "posts":
+				return ec.fieldContext_Author_posts(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Author", field.Name)
 		},
 	}
 	return fc, nil
@@ -2360,6 +2815,50 @@ func (ec *executionContext) fieldContext_Post_content(ctx context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Post_minutesToRead(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Post_minutesToRead(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MinutesToRead, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Post_minutesToRead(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Post",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2590,62 +3089,6 @@ func (ec *executionContext) fieldContext_Post_categories(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Post_author(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Post_author(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Author, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Auth)
-	fc.Result = res
-	return ec.marshalNAuth2ᚖgithubᚗcomᚋm3rashidᚋcleopetraᚋserverᚋgraphᚋmodelᚐAuth(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Post_author(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Post",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Auth_id(ctx, field)
-			case "username":
-				return ec.fieldContext_Auth_username(ctx, field)
-			case "name":
-				return ec.fieldContext_Auth_name(ctx, field)
-			case "password":
-				return ec.fieldContext_Auth_password(ctx, field)
-			case "role":
-				return ec.fieldContext_Auth_role(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Auth", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Post_comments(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Post_comments(ctx, field)
 	if err != nil {
@@ -2689,8 +3132,10 @@ func (ec *executionContext) fieldContext_Post_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "user":
 				return ec.fieldContext_Comment_user(ctx, field)
-			case "comment":
-				return ec.fieldContext_Comment_comment(ctx, field)
+			case "text":
+				return ec.fieldContext_Comment_text(ctx, field)
+			case "post":
+				return ec.fieldContext_Comment_post(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -2741,6 +3186,8 @@ func (ec *executionContext) fieldContext_Post_likes(ctx context.Context, field g
 				return ec.fieldContext_Like_id(ctx, field)
 			case "user":
 				return ec.fieldContext_Like_user(ctx, field)
+			case "post":
+				return ec.fieldContext_Like_post(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Like", field.Name)
 		},
@@ -2889,16 +3336,24 @@ func (ec *executionContext) fieldContext_Query_getAuthors(ctx context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Author_id(ctx, field)
+			case "user":
+				return ec.fieldContext_Author_user(ctx, field)
 			case "name":
 				return ec.fieldContext_Author_name(ctx, field)
 			case "email":
 				return ec.fieldContext_Author_email(ctx, field)
-			case "photo":
-				return ec.fieldContext_Author_photo(ctx, field)
 			case "bio":
 				return ec.fieldContext_Author_bio(ctx, field)
-			case "user":
-				return ec.fieldContext_Author_user(ctx, field)
+			case "website":
+				return ec.fieldContext_Author_website(ctx, field)
+			case "github":
+				return ec.fieldContext_Author_github(ctx, field)
+			case "instagram":
+				return ec.fieldContext_Author_instagram(ctx, field)
+			case "twitter":
+				return ec.fieldContext_Author_twitter(ctx, field)
+			case "photo":
+				return ec.fieldContext_Author_photo(ctx, field)
 			case "featured":
 				return ec.fieldContext_Author_featured(ctx, field)
 			case "published":
@@ -2953,16 +3408,24 @@ func (ec *executionContext) fieldContext_Query_getAuthor(ctx context.Context, fi
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Author_id(ctx, field)
+			case "user":
+				return ec.fieldContext_Author_user(ctx, field)
 			case "name":
 				return ec.fieldContext_Author_name(ctx, field)
 			case "email":
 				return ec.fieldContext_Author_email(ctx, field)
-			case "photo":
-				return ec.fieldContext_Author_photo(ctx, field)
 			case "bio":
 				return ec.fieldContext_Author_bio(ctx, field)
-			case "user":
-				return ec.fieldContext_Author_user(ctx, field)
+			case "website":
+				return ec.fieldContext_Author_website(ctx, field)
+			case "github":
+				return ec.fieldContext_Author_github(ctx, field)
+			case "instagram":
+				return ec.fieldContext_Author_instagram(ctx, field)
+			case "twitter":
+				return ec.fieldContext_Author_twitter(ctx, field)
+			case "photo":
+				return ec.fieldContext_Author_photo(ctx, field)
 			case "featured":
 				return ec.fieldContext_Author_featured(ctx, field)
 			case "published":
@@ -3028,6 +3491,8 @@ func (ec *executionContext) fieldContext_Query_getPosts(ctx context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Post_id(ctx, field)
+			case "author":
+				return ec.fieldContext_Post_author(ctx, field)
 			case "title":
 				return ec.fieldContext_Post_title(ctx, field)
 			case "slug":
@@ -3036,6 +3501,8 @@ func (ec *executionContext) fieldContext_Query_getPosts(ctx context.Context, fie
 				return ec.fieldContext_Post_excerpt(ctx, field)
 			case "content":
 				return ec.fieldContext_Post_content(ctx, field)
+			case "minutesToRead":
+				return ec.fieldContext_Post_minutesToRead(ctx, field)
 			case "featuredImage":
 				return ec.fieldContext_Post_featuredImage(ctx, field)
 			case "featured":
@@ -3046,8 +3513,6 @@ func (ec *executionContext) fieldContext_Query_getPosts(ctx context.Context, fie
 				return ec.fieldContext_Post_deleted(ctx, field)
 			case "categories":
 				return ec.fieldContext_Post_categories(ctx, field)
-			case "author":
-				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
 				return ec.fieldContext_Post_comments(ctx, field)
 			case "likes":
@@ -3100,6 +3565,8 @@ func (ec *executionContext) fieldContext_Query_getPost(ctx context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Post_id(ctx, field)
+			case "author":
+				return ec.fieldContext_Post_author(ctx, field)
 			case "title":
 				return ec.fieldContext_Post_title(ctx, field)
 			case "slug":
@@ -3108,6 +3575,8 @@ func (ec *executionContext) fieldContext_Query_getPost(ctx context.Context, fiel
 				return ec.fieldContext_Post_excerpt(ctx, field)
 			case "content":
 				return ec.fieldContext_Post_content(ctx, field)
+			case "minutesToRead":
+				return ec.fieldContext_Post_minutesToRead(ctx, field)
 			case "featuredImage":
 				return ec.fieldContext_Post_featuredImage(ctx, field)
 			case "featured":
@@ -3118,8 +3587,6 @@ func (ec *executionContext) fieldContext_Query_getPost(ctx context.Context, fiel
 				return ec.fieldContext_Post_deleted(ctx, field)
 			case "categories":
 				return ec.fieldContext_Post_categories(ctx, field)
-			case "author":
-				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
 				return ec.fieldContext_Post_comments(ctx, field)
 			case "likes":
@@ -5388,6 +5855,13 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "user":
+
+			out.Values[i] = ec._Author_user(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "name":
 
 			out.Values[i] = ec._Author_name(ctx, field, obj)
@@ -5402,21 +5876,30 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "photo":
-
-			out.Values[i] = ec._Author_photo(ctx, field, obj)
-
 		case "bio":
 
 			out.Values[i] = ec._Author_bio(ctx, field, obj)
 
-		case "user":
+		case "website":
 
-			out.Values[i] = ec._Author_user(ctx, field, obj)
+			out.Values[i] = ec._Author_website(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+		case "github":
+
+			out.Values[i] = ec._Author_github(ctx, field, obj)
+
+		case "instagram":
+
+			out.Values[i] = ec._Author_instagram(ctx, field, obj)
+
+		case "twitter":
+
+			out.Values[i] = ec._Author_twitter(ctx, field, obj)
+
+		case "photo":
+
+			out.Values[i] = ec._Author_photo(ctx, field, obj)
+
 		case "featured":
 
 			out.Values[i] = ec._Author_featured(ctx, field, obj)
@@ -5509,9 +5992,16 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "comment":
+		case "text":
 
-			out.Values[i] = ec._Comment_comment(ctx, field, obj)
+			out.Values[i] = ec._Comment_text(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "post":
+
+			out.Values[i] = ec._Comment_post(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -5547,6 +6037,13 @@ func (ec *executionContext) _Like(ctx context.Context, sel ast.SelectionSet, obj
 		case "user":
 
 			out.Values[i] = ec._Like_user(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "post":
+
+			out.Values[i] = ec._Like_post(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -5645,6 +6142,13 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "author":
+
+			out.Values[i] = ec._Post_author(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "title":
 
 			out.Values[i] = ec._Post_title(ctx, field, obj)
@@ -5669,6 +6173,13 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 		case "content":
 
 			out.Values[i] = ec._Post_content(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "minutesToRead":
+
+			out.Values[i] = ec._Post_minutesToRead(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -5701,13 +6212,6 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 		case "categories":
 
 			out.Values[i] = ec._Post_categories(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "author":
-
-			out.Values[i] = ec._Post_author(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -6459,6 +6963,21 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")

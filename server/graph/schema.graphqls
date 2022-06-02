@@ -29,9 +29,9 @@ type Author {
   email: String!
   bio: String
   website: String
-  github: string
-  instagram: string
-  twitter: string
+  github: String
+  instagram: String
+  twitter: String
   photo: String
   featured: Boolean
   published: Boolean

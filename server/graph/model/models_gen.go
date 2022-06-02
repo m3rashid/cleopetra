@@ -18,11 +18,15 @@ type Auth struct {
 
 type Author struct {
 	ID        string  `json:"id"`
+	User      *Auth   `json:"user"`
 	Name      string  `json:"name"`
 	Email     string  `json:"email"`
-	Photo     *string `json:"photo"`
 	Bio       *string `json:"bio"`
-	User      *Auth   `json:"user"`
+	Website   *string `json:"website"`
+	Github    *string `json:"github"`
+	Instagram *string `json:"instagram"`
+	Twitter   *string `json:"twitter"`
+	Photo     *string `json:"photo"`
 	Featured  *bool   `json:"featured"`
 	Published *bool   `json:"published"`
 	Posts     []*Post `json:"posts"`
@@ -35,28 +39,31 @@ type Category struct {
 }
 
 type Comment struct {
-	ID      string `json:"id"`
-	User    *Auth  `json:"user"`
-	Comment string `json:"comment"`
+	ID   string `json:"id"`
+	User *Auth  `json:"user"`
+	Text string `json:"text"`
+	Post *Post  `json:"post"`
 }
 
 type Like struct {
 	ID   string `json:"id"`
 	User *Auth  `json:"user"`
+	Post *Post  `json:"post"`
 }
 
 type Post struct {
 	ID            string      `json:"id"`
+	Author        *Author     `json:"author"`
 	Title         string      `json:"title"`
 	Slug          string      `json:"slug"`
 	Excerpt       string      `json:"excerpt"`
 	Content       string      `json:"content"`
+	MinutesToRead int         `json:"minutesToRead"`
 	FeaturedImage *string     `json:"featuredImage"`
 	Featured      bool        `json:"featured"`
 	Published     bool        `json:"published"`
 	Deleted       bool        `json:"deleted"`
 	Categories    []*Category `json:"categories"`
-	Author        *Auth       `json:"author"`
 	Comments      []*Comment  `json:"comments"`
 	Likes         []*Like     `json:"likes"`
 }
