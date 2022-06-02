@@ -24,11 +24,15 @@ type Auth {
 
 type Author {
   id: ID!
+  user: Auth!
   name: String!
   email: String!
-  photo: String
   bio: String
-  user: Auth!
+  website: String
+  github: string
+  instagram: string
+  twitter: string
+  photo: String
   featured: Boolean
   published: Boolean
   posts: [Post]!
@@ -43,32 +47,32 @@ type Category {
 type Like {
   id: ID!
   user: Auth!
+  post: Post!
 }
 
 type Comment {
   id: ID!
   user: Auth!
-  comment: String!
+  text: String!
+  post: Post!
 }
 
 type Post {
   id: ID!
+  author: Author!
   title: String!
   slug: String!
   excerpt: String!
   content: String!
+  minutesToRead: Int!
   featuredImage: String
   featured: Boolean!
   published: Boolean!
   deleted: Boolean!
   categories: [Category]!
-  author: Auth!
   comments: [Comment]!
   likes: [Like]!
 }
-
-
-
 
 input loginInput {
   username: String!
@@ -94,10 +98,10 @@ input createAuthorInput {
 }
 
 type Mutation {
-  login (input: loginInput) : Auth!
-  signup (input: signupInput): Auth!
-  verifyCreateAuthor (input: verifyCreateAuthorInput): String!
-  createAuthor (input: createAuthorInput): Author!
+  login(input: loginInput): Auth!
+  signup(input: signupInput): Auth!
+  verifyCreateAuthor(input: verifyCreateAuthorInput): String!
+  createAuthor(input: createAuthorInput): Author!
 }
 
 type Query {

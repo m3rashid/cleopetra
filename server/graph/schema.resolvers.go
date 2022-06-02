@@ -11,19 +11,27 @@ import (
 	"github.com/m3rashid/cleopetra/server/graph/model"
 )
 
-func (r *mutationResolver) Login(ctx context.Context, input *model.LoginInput) (*model.Auth, error) {
+func (r *mutationResolver) Login(
+	ctx context.Context,
+	input *model.LoginInput) (*model.Auth, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) Signup(ctx context.Context, input *model.SignupInput) (*model.Auth, error) {
+func (r *mutationResolver) Signup(
+	ctx context.Context,
+	input *model.SignupInput) (*model.Auth, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) VerifyCreateAuthor(ctx context.Context, input *model.VerifyCreateAuthorInput) (string, error) {
+func (r *mutationResolver) VerifyCreateAuthor(
+	ctx context.Context,
+	input *model.VerifyCreateAuthorInput) (string, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) CreateAuthor(ctx context.Context, input *model.CreateAuthorInput) (*model.Author, error) {
+func (r *mutationResolver) CreateAuthor(
+	ctx context.Context,
+	input *model.CreateAuthorInput) (*model.Author, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
