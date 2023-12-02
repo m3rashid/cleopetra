@@ -1,4 +1,4 @@
-### Looking for some more features or ideas??? Let's discuss on Discussions.
+### Cleopetra
 
 This is the go boilerplate on the top of fiber web framework.
 
